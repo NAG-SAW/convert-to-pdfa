@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Environments
+.env
+.venv
+
+# Project specific
+processed/
+temp_files/
+
+# IDE
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
