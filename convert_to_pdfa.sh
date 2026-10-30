@@ -1,5 +1,5 @@
 #!/bin/env bash
-set -o pipefail
+set -ou pipefail
 
 USAGE="convert_to_pdfa.sh <INPUT> <OUTPUT>"
 if [[ ! -f "$1" ]]; then
@@ -21,30 +21,24 @@ if [[ ! -f "$ICC_PATH" ]]; then
 fi
 
 cd processed
+pdffonts "../$1" | sed 's/[[:space:]].*//' | sed "1,2d" > /tmp/fonts_before.txt
 gs --permit-file-read="$ICC_PATH" \
  -sDEVICE=pdfwrite \
- -dCompatibilityLevel=1.4 \
- -dPDFSETTINGS=/printer \
- -dPDFA=1 \
- -dPDFACompatibilityPolicy=1 \
+ -dCompatibilityLevel=1.7 \
  -sProcessColorModel=DeviceRGB \
  -sColorConversionStrategy=RGB \
  -sOutputICCProfile="$ICC_PATH" \
- -dNOPAUSE -dQUIET -dBATCH \
+ -dEmbedAllFonts=true \
+ -dEmbedSubstituteFonts=true \
+ -dSubsetFonts=true \
+ -dCompressFonts=true \
+ -dNOPAUSE -dBATCH -dQUIET -dSAFER \
  -sOutputFile="../$2" \
- "../$1"
+ -sFONTPATH=/usr/local/share/fonts \
+ -c "<</NeverEmbed []>> setdistillerparams" \
+ -f "../$1"
 
-# TODO: This yields smaller files faster, but it prints
-# GPL Ghostscript 10.05.1: 
-#        pdfwrite cannot guarantee creating a conformant PDF/A-2 file with device-independent colour.
-#        We recommend converting to a device colour space.
-#        We cannot ignore this request, reverting to normal output.
-#
-# gs \
-#  -sDEVICE=pdfwrite \
-#  -dPDFA=2 \
-#  -dPDFACompatibilityPolicy=1 \
-#  -sColorConversionStrategy=UseDeviceIndependentColor \
-#  -dNOPAUSE -dQUIET -dBATCH \
-#  -sOutputFile="../$2" \
-#  "../$1"
+pdffonts "../$2" | sed 's/[[:space:]].*//' | sed "1,2d" > /tmp/fonts_after.txt
+
+echo "For the converted file ($1) the following fonts are missing:"
+comm -23 /tmp/fonts_before.txt /tmp/fonts_after.txt
