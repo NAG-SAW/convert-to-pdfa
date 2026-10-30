@@ -23,28 +23,14 @@ fi
 cd processed
 gs --permit-file-read="$ICC_PATH" \
  -sDEVICE=pdfwrite \
- -dCompatibilityLevel=1.4 \
- -dPDFSETTINGS=/printer \
- -dPDFA=1 \
- -dPDFACompatibilityPolicy=1 \
+ -dCompatibilityLevel=1.7 \
  -sProcessColorModel=DeviceRGB \
  -sColorConversionStrategy=RGB \
  -sOutputICCProfile="$ICC_PATH" \
- -dNOPAUSE -dQUIET -dBATCH \
+ -dEmbedAllFonts=true \
+ -dEmbedSubstituteFonts=true \
+ -dSubsetFonts=true \
+ -dCompressFonts=true \
+ -dNOPAUSE -dBATCH -dQUIET -dSAFER \
  -sOutputFile="../$2" \
  "../$1"
-
-# TODO: This yields smaller files faster, but it prints
-# GPL Ghostscript 10.05.1: 
-#        pdfwrite cannot guarantee creating a conformant PDF/A-2 file with device-independent colour.
-#        We recommend converting to a device colour space.
-#        We cannot ignore this request, reverting to normal output.
-#
-# gs \
-#  -sDEVICE=pdfwrite \
-#  -dPDFA=2 \
-#  -dPDFACompatibilityPolicy=1 \
-#  -sColorConversionStrategy=UseDeviceIndependentColor \
-#  -dNOPAUSE -dQUIET -dBATCH \
-#  -sOutputFile="../$2" \
-#  "../$1"
