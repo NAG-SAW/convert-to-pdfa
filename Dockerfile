@@ -7,6 +7,10 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
     icc-profiles-free \
     && rm -rf /var/lib/apt/lists/*
 
+# Install fontconfig & update font cache
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    fontconfig && fc-cache -fv
+
 # Create non-root user
 RUN useradd --create-home --shell /bin/bash appuser
 

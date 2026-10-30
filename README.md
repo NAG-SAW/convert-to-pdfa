@@ -40,14 +40,18 @@ The API will be available at `http://127.0.0.1:8000`
 
 For production deployment using Docker:
 
-1. Build the image:
+1. Download all fonts, that should be supported into `/usr/local/share/fonts`.
+
+2. Build the image:
    ```bash
    docker build -t pdf-convert .
    ```
 
-2. Run the container:
+3. Run the container:
    ```bash
-   docker run -p 8000:8000 pdf-convert
+   docker run \
+      -v /usr/local/share/fonts:/usr/local/share/fonts:ro \
+      -p 8000:8000 pdf-convert
    ```
 
 The API will be available at `http://localhost:8000`

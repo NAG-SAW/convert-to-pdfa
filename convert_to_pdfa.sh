@@ -1,5 +1,5 @@
 #!/bin/env bash
-set -o pipefail
+set -ou pipefail
 
 USAGE="convert_to_pdfa.sh <INPUT> <OUTPUT>"
 if [[ ! -f "$1" ]]; then
@@ -21,6 +21,7 @@ if [[ ! -f "$ICC_PATH" ]]; then
 fi
 
 cd processed
+pdffonts "../$1" | sed 's/[[:space:]].*//' | sed "1,2d" > /tmp/fonts_before.txt
 gs --permit-file-read="$ICC_PATH" \
  -sDEVICE=pdfwrite \
  -dCompatibilityLevel=1.7 \
@@ -33,4 +34,11 @@ gs --permit-file-read="$ICC_PATH" \
  -dCompressFonts=true \
  -dNOPAUSE -dBATCH -dQUIET -dSAFER \
  -sOutputFile="../$2" \
- "../$1"
+ -sFONTPATH=/usr/local/share/fonts \
+ -c "<</NeverEmbed []>> setdistillerparams" \
+ -f "../$1"
+
+pdffonts "../$2" | sed 's/[[:space:]].*//' | sed "1,2d" > /tmp/fonts_after.txt
+
+echo "For the converted file ($1) the following fonts are missing:"
+comm -23 /tmp/fonts_before.txt /tmp/fonts_after.txt
